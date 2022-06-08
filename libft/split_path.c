@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   split_path.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/08 19:36:38 by hrolle            #+#    #+#             */
+/*   Updated: 2022/06/08 19:44:51 by hrolle           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../pipex.h"
 
 int	compt_path(char *s)
@@ -27,11 +39,12 @@ char	**free_tab(char **strs)
 
 char	*path_and_cmd(char *path, char *cmd)
 {
-	int	i;
-	char *ret;
+	int		i;
+	char	*ret;
 
+	i = ft_strlen_c(path, ':') + ft_strlen_c(cmd, ':') + 2;
+	ret = malloc(i * sizeof(char));
 	i = 0;
-	ret = malloc((ft_strlen_c(path, ':') + ft_strlen_c(cmd, ':') + 2) * sizeof(char));
 	if (!ret)
 		return (NULL);
 	while (*path && *path != ':')
