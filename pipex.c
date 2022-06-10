@@ -6,7 +6,7 @@
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 19:23:41 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/08 20:07:31 by hrolle           ###   ########.fr       */
+/*   Updated: 2022/06/10 07:36:52 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,38 +77,18 @@ int	main(int ac, char **av, char *envp[])
 }
 */
 
-void	child_cmd(int *fd, int file, char *cmd, char **envp)
+void	exec_cmd(int *fdin, int *fdout, char *cmd, char **envp)
 {
 	int		i;
 	char	**command;
 	char	**path;
 
-	close(fd[0]);
-	dup2(fd[1], STDOUT_FILENO);
-	dup2(file, STDIN_FILENO);
-	close(fd[1]);
-	close(file);
-	i = 0;
-	command = ft_split(cmd, ' ');
-	while (envp[i] && !ft_strcmp("PATH=", envp[i]))
-		i++;
-	path = split_path(envp[i] + 5, *command);
-	i = 0;
-	while (path[i] && execve(path[i], command, envp))
-		i++;
-}
-
-void	parent_cmd(int *fd, int file, char *cmd, char **envp)
-{
-	int		i;
-	char	**command;
-	char	**path;
-
-	close(fd[1]);
-	dup2(fd[0], STDIN_FILENO);
-	dup2(file, STDOUT_FILENO);
-	close(fd[0]);
-	close(file);
+	close(fdin[1]);
+	close(fdout[0]);
+	dup2(fdin[0], STDIN_FILENO);
+	dup2(fdout[1], STDOUT_FILENO);
+	close(fdin[0]);
+	close(fdout[1]);
 	i = 0;
 	command = ft_split(cmd, ' ');
 	while (envp[i] && !ft_strcmp("PATH=", envp[i]))
@@ -122,17 +102,16 @@ void	parent_cmd(int *fd, int file, char *cmd, char **envp)
 int	main(int ac, char **av, char *envp[])
 {
 	int	fd[2];
+	int	file[2];
 	int	pid;
-	int	fdin;
-	int	fdout;
 
 	if (ac < 5)
 		return (ret_error("More arguments are required"));
-	fdin = open(av[1], O_RDONLY);
-	if (fdin == -1)
+	file[0] = open(av[1], O_RDONLY);
+	if (file[0] == -1)
 		return (ret_error("File 1 not open"));
-	fdout = open(av[ac - 1], O_WRONLY | O_CREAT);
-	if (fdin == -1)
+	file[1] = open(av[ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (file[1] == -1)
 		return (ret_error("File 2 not open"));
 	if (pipe(fd) == -1)
 		return (ret_error("Pipe didn't work"));
@@ -140,10 +119,10 @@ int	main(int ac, char **av, char *envp[])
 	if (pid == -1)
 		return (ret_error("Fork didn't work"));
 	if (!pid)
-		child_cmd(fd, fdin, av[2], envp);
+		exec_cmd(file, fd, av[2], envp);
 	else
-		parent_cmd(fd, fdout, av[3], envp);
-	close(fdin);
-	close(fdout);
+		exec_cmd(fd, file, av[ac - 2], envp);
+//	close(file[0]);
+//	close(file[1]);
 	return (0);
 }

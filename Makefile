@@ -9,7 +9,7 @@ BOLD = \033[1m
 
 RM = rm -rf
 
-SRC = $(wildcard *.c libft/*.c)
+SRC = $(wildcard *.c libft/*.c free_and_secure/*.c)
 
 OBJ = $(SRC:.c=.o)
 
