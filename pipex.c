@@ -6,7 +6,7 @@
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 19:23:41 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/11 19:33:17 by hrolle           ###   ########.fr       */
+/*   Updated: 2022/06/11 20:17:37 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,7 @@ int	main(int ac, char **av, char *envp[])
 			else
 				close(fd[i][0]);
 			wait(&pid);
-			if (++i == ac - 4)
+			if (++i == ac - (cmd_i + 2))
 				exec_cmd(fd[i], fd[0], av[cmd_i + i], envp);
 		}
 	}
