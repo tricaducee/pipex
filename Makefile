@@ -17,7 +17,7 @@ NAME = pipex
 
 CC = gcc
 
-CFLAGS = -Wall -Werror -Wextra
+CFLAGS = -Wall -Werror -Wextra -fsanitize=address -g3
 
 $(NAME) : $(OBJ)
 	@make -C printf

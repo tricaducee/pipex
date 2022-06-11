@@ -6,13 +6,13 @@
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 19:23:41 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/10 07:36:52 by hrolle           ###   ########.fr       */
+/*   Updated: 2022/06/11 19:33:17 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int	**fds_tab_gen(int size)
+int	**pipes_tab_gen(int size)
 {
 	int	**ret;
 	int	i;
@@ -29,6 +29,13 @@ int	**fds_tab_gen(int size)
 		i++;
 	}
 	ret[i] = NULL;
+	i = 1;
+	while (ret[i])
+	{
+		if (pipe(ret[i]) == -1)
+			return (free_tabs(ret));
+		i++;
+	}
 	return (ret);
 }
 
@@ -40,42 +47,6 @@ void	print_tab(char **strs)
 		strs++;
 	}
 }
-/*
-int	main(int ac, char **av, char *envp[])
-{
-	int		i;
-	int		**pipes_fds;
-	char	**command;
-	char	**path;
-
-	i = 0;
-	command = ft_split(av[1], ' ');
-	pipes_fds = fds_tab_gen(ac - 3);
-	if (!pipes_fds)
-	{
-		ft_printf("#rERROR#0 : [#/rgenerating pipes#0]");
-		//return (0);
-	}
-	while (envp[i])
-	{
-		if (ft_strcmp("PATH=", envp[i]))
-			break ;
-		i++;
-	}
-	path = split_path(envp[i] + 5, *command);
-	i = 0;
-	while (path[i] && execve(path[i], command, envp))
-		i++;
-	if (!path[i])
-	{
-		ft_printf("#rERROR#0 : [#/rLa commande n'existe pas#0]");
-		return (0);
-	}
-	
-	print_tab(path);
-	return (0);
-}
-*/
 
 void	exec_cmd(int *fdin, int *fdout, char *cmd, char **envp)
 {
@@ -101,28 +72,66 @@ void	exec_cmd(int *fdin, int *fdout, char *cmd, char **envp)
 
 int	main(int ac, char **av, char *envp[])
 {
-	int	fd[2];
-	int	file[2];
-	int	pid;
+	char	*heredoc;
+	int		**fd;
+	int		pid;
+	int		i;
+	int		cmd_i;
 
+	i = 0;
 	if (ac < 5)
 		return (ret_error("More arguments are required"));
-	file[0] = open(av[1], O_RDONLY);
-	if (file[0] == -1)
-		return (ret_error("File 1 not open"));
-	file[1] = open(av[ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (file[1] == -1)
-		return (ret_error("File 2 not open"));
-	if (pipe(fd) == -1)
-		return (ret_error("Pipe didn't work"));
-	pid = fork();
-	if (pid == -1)
-		return (ret_error("Fork didn't work"));
-	if (!pid)
-		exec_cmd(file, fd, av[2], envp);
+	if (ft_strcmp("here_doc", av[1]))
+	{
+		cmd_i = 3;
+		heredoc = heredoc_str(av[2]);
+		//ft_printf("heredoc = %s\n", heredoc);
+		fd = pipes_tab_gen(ac - 3);
+		if (!fd)
+			return (ret_error("Pipe gen didn't work"));
+		pipe(fd[0]);
+		write(fd[0][1], heredoc, ft_strlen(heredoc));
+		close(fd[0][1]);
+		free(heredoc);
+	}
 	else
-		exec_cmd(fd, file, av[ac - 2], envp);
-//	close(file[0]);
-//	close(file[1]);
+	{
+		cmd_i = 2;
+		fd = pipes_tab_gen(ac - 2);
+		if (!fd)
+			return (ret_error("Pipe gen didn't work"));
+		fd[0][0] = open(av[1], O_RDONLY);
+		if (fd[0][0] == -1)
+			return (ret_error("File 1 not open"));
+	}
+	fd[0][1] = open(av[ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (fd[0][1] == -1)
+		return (ret_error("File 2 not open"));
+	i = 0;
+	while (i < ac - (cmd_i + 2))
+	{
+		pid = fork();
+		if (pid == -1)
+			return (ret_error("Fork didn't work"));
+		if (!pid)
+		{
+			exec_cmd(fd[i], fd[i + 1], av[cmd_i + i], envp);
+		}
+		else
+		{
+			if (i)
+			{
+				close(fd[i][0]);
+				close(fd[i][1]);
+			}
+			else
+				close(fd[i][0]);
+			wait(&pid);
+			if (++i == ac - 4)
+				exec_cmd(fd[i], fd[0], av[cmd_i + i], envp);
+		}
+	}
+//	close(fd[0][0]);
+//	close(fd[0][1]);
 	return (0);
 }

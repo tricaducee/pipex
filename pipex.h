@@ -6,7 +6,7 @@
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 19:24:07 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/08 19:53:43 by hrolle           ###   ########.fr       */
+/*   Updated: 2022/06/11 10:53:10 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <stdlib.h>
 # include "printf/HEADER/ft_printf.h"
 
+char	*heredoc_str(char *limiter);
 char	**ft_split(char *s, char c);
 char	**split_path(char *str, char *cmd);
 char	*ft_substr(char *s, unsigned int start, size_t len);
