@@ -6,21 +6,11 @@
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/11 10:29:10 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/11 11:53:12 by hrolle           ###   ########.fr       */
+/*   Updated: 2022/06/13 01:36:04 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-size_t	ft_strlen(const char *s)
-{
-	size_t	i;
-
-	i = 0;
-	while (s[i])
-		i++;
-	return (i);
-}
 
 char	*ft_strjoin(const char *s1, const char *s2)
 {
@@ -53,35 +43,46 @@ int	nl_strcmp(char *s1, char *s2)
 	return (0);
 }
 
+char	*check_limiter(char *limiter)
+{
+	char	*line;
+	char	*tmp;
+	char	buf[2];
+
+	buf[1] = 0;
+	line = malloc(1 * sizeof(char));
+	*line = '\0';
+	while (1)
+	{
+		read(0, buf, 1);
+		tmp = line;
+		line = ft_strjoin(tmp, buf);
+		free(tmp);
+		if (*buf == '\n')
+			break ;
+	}
+	if (nl_strcmp(line, limiter))
+	{
+		free(line);
+		return (NULL);
+	}
+	return (line);
+}
+
 char	*heredoc_str(char *limiter)
 {
-	char	buf[2];
 	char	*ret;
 	char	*line;
 	char	*tmp;
 
-	buf[1] = 0;
 	ret = malloc(1 * sizeof(char));
 	ret[0] = '\0';
 	write(1, "heredoc> ", 10);
 	while (1)
 	{
-		line = malloc(1 * sizeof(char));
-		line[0] = '\0';
-		while (1)
-		{
-			read(0, buf, 1);
-			tmp = line;
-			line = ft_strjoin(tmp, buf);
-			free(tmp);
-			if (*buf == '\n')
-				break ;
-		}
-		if (nl_strcmp(line, limiter))
-		{
-			free(line);
+		line = check_limiter(limiter);
+		if (!line)
 			break ;
-		}
 		tmp = ret;
 		ret = ft_strjoin(tmp, line);
 		free(tmp);

@@ -6,47 +6,11 @@
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 19:23:41 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/11 20:17:37 by hrolle           ###   ########.fr       */
+/*   Updated: 2022/06/13 01:36:22 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-int	**pipes_tab_gen(int size)
-{
-	int	**ret;
-	int	i;
-
-	i = 0;
-	ret = malloc((size + 1) * sizeof(int *));
-	if (!ret)
-		return (NULL);
-	while (i < size)
-	{
-		ret[i] = malloc(2 * sizeof(int));
-		if (!ret[i])
-			return (free_tabs(ret));
-		i++;
-	}
-	ret[i] = NULL;
-	i = 1;
-	while (ret[i])
-	{
-		if (pipe(ret[i]) == -1)
-			return (free_tabs(ret));
-		i++;
-	}
-	return (ret);
-}
-
-void	print_tab(char **strs)
-{
-	while (*strs)
-	{
-		ft_printf("%s\n", *strs);
-		strs++;
-	}
-}
 
 void	exec_cmd(int *fdin, int *fdout, char *cmd, char **envp)
 {
@@ -70,56 +34,17 @@ void	exec_cmd(int *fdin, int *fdout, char *cmd, char **envp)
 		i++;
 }
 
-int	**fd_gen(int ac, char **av, int *cmd_i)
+int	multi_exec(int ac, char **av, char **envp, int **fd)
 {
-	char	*heredoc;
-	int		**fd;
+	int	pid;
+	int	cmd_i;
+	int	i;
 
-	if (ft_strcmp("here_doc", av[1]))
-	{
-		*cmd_i = 3;
-		heredoc = heredoc_str(av[2]);
-		//ft_printf("heredoc = %s\n", heredoc);
-		fd = pipes_tab_gen(ac - 3);
-		if (!fd)
-			return (NULL);
-		pipe(fd[0]);
-		write(fd[0][1], heredoc, ft_strlen(heredoc));
-		close(fd[0][1]);
-		free(heredoc);
-		fd[0][1] = open(av[ac - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
-		if (fd[0][1] == -1)
-			return (NULL);
-	}
-	else
-	{
-		*cmd_i = 2;
-		fd = pipes_tab_gen(ac - 2);
-		if (!fd)
-			return (NULL);
-		fd[0][0] = open(av[1], O_RDONLY);
-		if (fd[0][0] == -1)
-			return (NULL);
-		fd[0][1] = open(av[ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-		if (fd[0][1] == -1)
-			return (NULL);
-	}
-	return (fd);
-}
-
-int	main(int ac, char **av, char *envp[])
-{
-	int		**fd;
-	int		pid;
-	int		i;
-	int		cmd_i;
-
-	if (ac < 5)
-		return (ret_error("More arguments are required"));
-	fd = fd_gen(ac, av, &cmd_i);
-	if (!fd)
-		return(ret_error("fd_gen fail"));	
 	i = 0;
+	if (ft_strcmp(av[1], "here_doc"))
+		cmd_i = 3;
+	else
+		cmd_i = 2;
 	while (i < ac - (cmd_i + 2))
 	{
 		pid = fork();
@@ -129,17 +54,38 @@ int	main(int ac, char **av, char *envp[])
 			exec_cmd(fd[i], fd[i + 1], av[cmd_i + i], envp);
 		else
 		{
-			if (i)
-			{
-				close(fd[i][0]);
-				close(fd[i][1]);
-			}
-			else
-				close(fd[i][0]);
+			if_close_fd(i, fd);
 			wait(&pid);
 			if (++i == ac - (cmd_i + 2))
 				exec_cmd(fd[i], fd[0], av[cmd_i + i], envp);
 		}
 	}
+	return (1);
+}
+
+int	main(int ac, char **av, char *envp[])
+{
+	int		**fd;
+
+	if (ac < 4)
+		return (ret_error("More arguments are required"));
+	fd = fd_gen(ac, av);
+	if (!fd)
+		return (ret_error("fd_gen fail"));
+	if (ac == 4)
+		exec_cmd(fd[0], fd[0], av[ac - 2], envp);
+	else
+		multi_exec(ac, av, envp, fd);
 	return (0);
 }
+
+/*
+void	print_tab(char **strs)
+{
+	while (*strs)
+	{
+		ft_printf("%s\n", *strs);
+		strs++;
+	}
+}
+*/

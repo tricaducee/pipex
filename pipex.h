@@ -6,7 +6,7 @@
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 19:24:07 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/11 10:53:10 by hrolle           ###   ########.fr       */
+/*   Updated: 2022/06/13 01:33:58 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,5 +29,12 @@ int		ft_strcmp(char *s1, char *s2);
 int		**free_tabs(int **tabs);
 int		ret_error(char *str);
 int		exit_error(char *str);
+void	if_close_fd(int i, int **fd);
+int		**heredoc_fd(int ac, char **av);
+int		**no_heredoc_fd(int ac, char **av);
+int		**fd_gen(int ac, char **av);
+int		**pipes_tab_gen(int size);
+void	exec_cmd(int *fdin, int *fdout, char *cmd, char **envp);
+int		multi_exec(int ac, char **av, char **envp, int **fd);
 
 #endif
