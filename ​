@@ -1,5 +1,0 @@
-int	compt_path(char *s)$
-	int	j;$
-	int		i;$
-	int		i;$
-	int		cmd_len;$
