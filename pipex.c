@@ -70,43 +70,55 @@ void	exec_cmd(int *fdin, int *fdout, char *cmd, char **envp)
 		i++;
 }
 
-int	main(int ac, char **av, char *envp[])
+int	**fd_gen(int ac, char **av, int *cmd_i)
 {
 	char	*heredoc;
+	int		**fd;
+
+	if (ft_strcmp("here_doc", av[1]))
+	{
+		*cmd_i = 3;
+		heredoc = heredoc_str(av[2]);
+		//ft_printf("heredoc = %s\n", heredoc);
+		fd = pipes_tab_gen(ac - 3);
+		if (!fd)
+			return (NULL);
+		pipe(fd[0]);
+		write(fd[0][1], heredoc, ft_strlen(heredoc));
+		close(fd[0][1]);
+		free(heredoc);
+		fd[0][1] = open(av[ac - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+		if (fd[0][1] == -1)
+			return (NULL);
+	}
+	else
+	{
+		*cmd_i = 2;
+		fd = pipes_tab_gen(ac - 2);
+		if (!fd)
+			return (NULL);
+		fd[0][0] = open(av[1], O_RDONLY);
+		if (fd[0][0] == -1)
+			return (NULL);
+		fd[0][1] = open(av[ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		if (fd[0][1] == -1)
+			return (NULL);
+	}
+	return (fd);
+}
+
+int	main(int ac, char **av, char *envp[])
+{
 	int		**fd;
 	int		pid;
 	int		i;
 	int		cmd_i;
 
-	i = 0;
 	if (ac < 5)
 		return (ret_error("More arguments are required"));
-	if (ft_strcmp("here_doc", av[1]))
-	{
-		cmd_i = 3;
-		heredoc = heredoc_str(av[2]);
-		//ft_printf("heredoc = %s\n", heredoc);
-		fd = pipes_tab_gen(ac - 3);
-		if (!fd)
-			return (ret_error("Pipe gen didn't work"));
-		pipe(fd[0]);
-		write(fd[0][1], heredoc, ft_strlen(heredoc));
-		close(fd[0][1]);
-		free(heredoc);
-	}
-	else
-	{
-		cmd_i = 2;
-		fd = pipes_tab_gen(ac - 2);
-		if (!fd)
-			return (ret_error("Pipe gen didn't work"));
-		fd[0][0] = open(av[1], O_RDONLY);
-		if (fd[0][0] == -1)
-			return (ret_error("File 1 not open"));
-	}
-	fd[0][1] = open(av[ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (fd[0][1] == -1)
-		return (ret_error("File 2 not open"));
+	fd = fd_gen(ac, av, &cmd_i);
+	if (!fd)
+		return(ret_error("fd_gen fail"));	
 	i = 0;
 	while (i < ac - (cmd_i + 2))
 	{
@@ -114,9 +126,7 @@ int	main(int ac, char **av, char *envp[])
 		if (pid == -1)
 			return (ret_error("Fork didn't work"));
 		if (!pid)
-		{
 			exec_cmd(fd[i], fd[i + 1], av[cmd_i + i], envp);
-		}
 		else
 		{
 			if (i)
@@ -131,7 +141,5 @@ int	main(int ac, char **av, char *envp[])
 				exec_cmd(fd[i], fd[0], av[cmd_i + i], envp);
 		}
 	}
-//	close(fd[0][0]);
-//	close(fd[0][1]);
 	return (0);
 }

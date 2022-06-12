@@ -15,5 +15,5 @@
 int	ret_error(char *str)
 {
 	ft_printf ("#rERROR#0 : [#/r%s#0]", str);
-	return (1);
+	return (0);
 }
