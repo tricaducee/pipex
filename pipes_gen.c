@@ -6,79 +6,69 @@
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 01:26:07 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/13 01:27:39 by hrolle           ###   ########.fr       */
+/*   Updated: 2022/06/16 21:35:22 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int	**pipes_tab_gen(int size)
+void	pipes_tab_gen(int size, t_ptr *tabs)
 {
-	int	**ret;
 	int	i;
 
 	i = 0;
-	ret = malloc((size + 1) * sizeof(int *));
-	if (!ret)
-		return (NULL);
+	tabs->fd = malloc((size + 1) * sizeof(int *));
+	if (!tabs->fd)
+		exit_error(errno, "Malloc", tabs);
 	while (i < size)
 	{
-		ret[i] = malloc(2 * sizeof(int));
-		if (!ret[i])
-			return (free_tabs(ret));
+		tabs->fd[i] = malloc(2 * sizeof(int));
+		if (!tabs->fd[i])
+			exit_error(errno, "Malloc", tabs);
 		i++;
 	}
-	ret[i] = NULL;
+	tabs->fd[i] = NULL;
 	i = 1;
-	while (ret[i])
+	while (tabs->fd[i])
 	{
-		if (pipe(ret[i]) == -1)
-			return (free_tabs(ret));
+		if (pipe(tabs->fd[i]) == -1)
+			exit_error(errno, "Pipe error", tabs);
 		i++;
 	}
-	return (ret);
 }
 
-int	**heredoc_fd(int ac, char **av)
+void	heredoc_fd(int ac, t_ptr *tabs)
 {
-	char	*heredoc;
-	int		**fd;
-
-	heredoc = heredoc_str(av[2]);
-	fd = pipes_tab_gen(ac - 3);
-	if (!fd)
-		return (NULL);
-	pipe(fd[0]);
-	write(fd[0][1], heredoc, ft_strlen(heredoc));
-	close(fd[0][1]);
-	free(heredoc);
-	fd[0][1] = open(av[ac - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
-	if (fd[0][1] == -1)
-		return (NULL);
-	return (fd);
+	heredoc_str(tabs);
+	pipes_tab_gen(ac - 3, tabs);
+	if (pipe(tabs->fd[0]) == -1)
+		exit_error(errno, "Pipe not work", tabs);
+	write(tabs->fd[0][1], tabs->heredoc, ft_strlen(tabs->heredoc));
+	close(tabs->fd[0][1]);
+	free(tabs->heredoc);
+	tabs->heredoc = NULL;
+	tabs->fd[0][1]
+		= open(tabs->av[ac - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+	if (tabs->fd[0][1] == -1)
+		exit_error(errno, tabs->av[ac -1], tabs);
 }
 
-int	**no_heredoc_fd(int ac, char **av)
+void	no_heredoc_fd(int ac, t_ptr *tabs)
 {
-	int	**fd;
-
-	fd = pipes_tab_gen(ac - 2);
-	if (!fd)
-		return (NULL);
-	fd[0][0] = open(av[1], O_RDONLY);
-	if (fd[0][0] == -1)
-		return (NULL);
-	fd[0][1] = open(av[ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (fd[0][1] == -1)
-		return (NULL);
-	return (fd);
+	pipes_tab_gen(ac - 2, tabs);
+	tabs->fd[0][0] = open(tabs->av[1], O_RDONLY);
+	if (tabs->fd[0][0] == -1)
+		exit_error(errno, tabs->av[1], tabs);
+	tabs->fd[0][1] = open(tabs->av[ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (tabs->fd[0][1] == -1)
+		exit_error(errno, tabs->av[ac -1], tabs);
 }
 
-int	**fd_gen(int ac, char **av)
+void	fd_gen(int ac, t_ptr *tabs)
 {
-	if (ft_strcmp("here_doc", av[1]))
-		return (heredoc_fd(ac, av));
-	return (no_heredoc_fd(ac, av));
+	if (ft_strcmp("here_doc", tabs->av[1]))
+		return (heredoc_fd(ac, tabs));
+	return (no_heredoc_fd(ac, tabs));
 }
 
 void	if_close_fd(int i, int **fd)

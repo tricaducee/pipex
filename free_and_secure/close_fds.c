@@ -1,33 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exit_error.c                                       :+:      :+:    :+:   */
+/*   close_fds.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/08 19:53:07 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/16 21:25:16 by hrolle           ###   ########.fr       */
+/*   Created: 2022/06/16 18:18:35 by hrolle            #+#    #+#             */
+/*   Updated: 2022/06/16 21:17:51 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../pipex.h"
 
-void	exit_error(int errnum, char *str, t_ptr *tabs)
+void	close_fds(int **fd)
 {
-	if (tabs->fd)
+	while (*fd)
 	{
-		close_fds(tabs->fd);
-		free_int_fd(tabs->fd);
+		if ((*fd)[0] < 2)
+			close((*fd)[0]);
+		if ((*fd)[1] < 2)
+			close((*fd)[1]);
+		fd++;
 	}
-	if (tabs->path)
-		free_strs(tabs->path);
-	if (tabs->command)
-		free_strs(tabs->command);
-	if (tabs->heredoc)
-	{
-		free(tabs->heredoc);
-		tabs->heredoc = NULL;
-	}
-	ft_printfd(2, "#rERROR#0 : [#/r%s #0:#r/ %s#0]\n", str, strerror(errnum));
-	exit (errnum);
 }

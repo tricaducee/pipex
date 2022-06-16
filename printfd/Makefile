@@ -9,21 +9,22 @@ BOLD = \033[1m
 
 RM = rm -rf
 
-SRC = $(wildcard *.c libft/*.c free_and_secure/*.c)
+SRC = $(wildcard */*.c)
 
 OBJ = $(SRC:.c=.o)
 
-NAME = pipex
+NAME = libftprintfd.a
 
 CC = gcc
 
-CFLAGS = -Wall -Werror -Wextra -fsanitize=address -g3
+AR = ar rcs
+
+CFLAGS = -Wall -Werror -Wextra
 
 $(NAME) : $(OBJ)
-	@make -C printfd
-	$(ECHO) "$(YELLOW)Compilation de pipex...$(RESETTXT)"
-	@$(CC) $(CFLAGS) -o $@ printfd/libftprintfd.a $^
-	$(ECHO) "$(GREEN)$(BOLD)Compilation Terminée !!!$(RESETTXT)"
+	$(ECHO) "$(YELLOW)Compilation de libftprintfd.a...$(RESETTXT)"
+	@$(AR) $@ $^
+	$(ECHO)  "$(GREEN)$(BOLD)Compilation Terminée !!!$(RESETTXT)"
 
 %.o : %.c
 	$(PRINT) "$(YELLOW)Generation des objets...$(RESETTXT)\r"
@@ -34,14 +35,12 @@ bonus : $(NAME)
 all : $(NAME)
 
 clean :
-	@make clean -C printfd 
 	$(ECHO) "$(RED)Suppression des objets...$(RESETTXT)"
 	@$(RM) $(OBJ)
 	$(ECHO) "$(GREEN)$(BOLD)Terminé !$(RESETTXT)"
 
 fclean : clean
-	@$(RM) printfd/libftprintfd.a
-	$(ECHO) "$(RED)Suppression de pipex et libftprintfd.a...$(RESETTXT)"
+	$(ECHO) "$(RED)Suppression de libftprintfd.a...$(RESETTXT)"
 	@$(RM) $(NAME)
 	$(ECHO) "$(GREEN)$(BOLD)Terminé !$(RESETTXT)"
 

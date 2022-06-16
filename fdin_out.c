@@ -1,33 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exit_error.c                                       :+:      :+:    :+:   */
+/*   fdin_out.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/08 19:53:07 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/16 21:25:16 by hrolle           ###   ########.fr       */
+/*   Created: 2022/06/16 21:38:51 by hrolle            #+#    #+#             */
+/*   Updated: 2022/06/16 21:39:41 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../pipex.h"
+#include "pipex.h"
 
-void	exit_error(int errnum, char *str, t_ptr *tabs)
+void	fdin_out(int fdin, int fdout, t_ptr *tabs)
 {
-	if (tabs->fd)
-	{
-		close_fds(tabs->fd);
-		free_int_fd(tabs->fd);
-	}
-	if (tabs->path)
-		free_strs(tabs->path);
-	if (tabs->command)
-		free_strs(tabs->command);
-	if (tabs->heredoc)
-	{
-		free(tabs->heredoc);
-		tabs->heredoc = NULL;
-	}
-	ft_printfd(2, "#rERROR#0 : [#/r%s #0:#r/ %s#0]\n", str, strerror(errnum));
-	exit (errnum);
+	if (dup2(fdin, STDIN_FILENO) == -1)
+		exit_error(errno, "Dup2", tabs);
+	if (dup2(fdout, STDOUT_FILENO) == -1)
+		exit_error(errno, "Dup2", tabs);
+}
+
+void	close2(int fd1, int fd2)
+{
+	close(fd1);
+	close(fd2);
 }

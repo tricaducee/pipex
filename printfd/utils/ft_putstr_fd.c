@@ -1,33 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exit_error.c                                       :+:      :+:    :+:   */
+/*   ft_putstr_fd.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/08 19:53:07 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/16 21:25:16 by hrolle           ###   ########.fr       */
+/*   Created: 2022/05/23 17:15:52 by hrolle            #+#    #+#             */
+/*   Updated: 2022/06/16 12:21:54 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../pipex.h"
+#include "../HEADER/ft_printfd.h"
 
-void	exit_error(int errnum, char *str, t_ptr *tabs)
+void	ft_putstr_fd(int fd, char *s)
 {
-	if (tabs->fd)
-	{
-		close_fds(tabs->fd);
-		free_int_fd(tabs->fd);
-	}
-	if (tabs->path)
-		free_strs(tabs->path);
-	if (tabs->command)
-		free_strs(tabs->command);
-	if (tabs->heredoc)
-	{
-		free(tabs->heredoc);
-		tabs->heredoc = NULL;
-	}
-	ft_printfd(2, "#rERROR#0 : [#/r%s #0:#r/ %s#0]\n", str, strerror(errnum));
-	exit (errnum);
+	if (!s)
+		return ;
+	while (*s)
+		write(fd, s++, 1);
+}
+
+void	ft_putlstr_fd(int fd, char *s, int len)
+{
+	int	i;
+
+	if (!s)
+		return ;
+	i = 0;
+	while (i < len)
+		write(fd, s + i++, 1);
 }

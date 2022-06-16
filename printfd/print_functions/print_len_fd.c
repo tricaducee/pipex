@@ -1,33 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exit_error.c                                       :+:      :+:    :+:   */
+/*   print_len_fd.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/08 19:53:07 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/16 21:25:16 by hrolle           ###   ########.fr       */
+/*   Created: 2022/05/26 20:47:58 by hrolle            #+#    #+#             */
+/*   Updated: 2022/06/16 10:55:34 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../pipex.h"
+#include "../HEADER/ft_printfd.h"
 
-void	exit_error(int errnum, char *str, t_ptr *tabs)
+int	print_len_fd(int fd, t_flags *flags, int c)
 {
-	if (tabs->fd)
-	{
-		close_fds(tabs->fd);
-		free_int_fd(tabs->fd);
-	}
-	if (tabs->path)
-		free_strs(tabs->path);
-	if (tabs->command)
-		free_strs(tabs->command);
-	if (tabs->heredoc)
-	{
-		free(tabs->heredoc);
-		tabs->heredoc = NULL;
-	}
-	ft_printfd(2, "#rERROR#0 : [#/r%s #0:#r/ %s#0]\n", str, strerror(errnum));
-	exit (errnum);
+	if (!flags->len)
+		return (write(fd, &c, 1));
+	if (flags->min)
+		ft_putchar_fd(fd, c);
+	if (flags->zero && !flags->min)
+		repeat_putchar_fd(fd, '0', flags->len - 1);
+	else
+		repeat_putchar_fd(fd, ' ', flags->len - 1);
+	if (!flags->min)
+		ft_putchar_fd(fd, c);
+	return (flags->len);
 }

@@ -6,7 +6,7 @@
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/11 10:29:10 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/13 01:36:04 by hrolle           ###   ########.fr       */
+/*   Updated: 2022/06/16 21:25:39 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int	nl_strcmp(char *s1, char *s2)
 	return (0);
 }
 
-char	*check_limiter(char *limiter)
+char	*check_limiter(t_ptr *tabs)
 {
 	char	*line;
 	char	*tmp;
@@ -51,6 +51,8 @@ char	*check_limiter(char *limiter)
 
 	buf[1] = 0;
 	line = malloc(1 * sizeof(char));
+	if (!line)
+		exit_error(errno, "Malloc", tabs);
 	*line = '\0';
 	while (1)
 	{
@@ -58,36 +60,37 @@ char	*check_limiter(char *limiter)
 		tmp = line;
 		line = ft_strjoin(tmp, buf);
 		free(tmp);
+		if (!line)
+			exit_error(errno, "Malloc", tabs);
 		if (*buf == '\n')
 			break ;
 	}
-	if (nl_strcmp(line, limiter))
-	{
-		free(line);
-		return (NULL);
-	}
+	if (nl_strcmp(line, tabs->av[2]))
+		free_and_null(&line);
 	return (line);
 }
 
-char	*heredoc_str(char *limiter)
+void	heredoc_str(t_ptr *tabs)
 {
-	char	*ret;
 	char	*line;
 	char	*tmp;
 
-	ret = malloc(1 * sizeof(char));
-	ret[0] = '\0';
+	tabs->heredoc = malloc(1 * sizeof(char));
+	if (!tabs->heredoc)
+		exit_error(errno, "Malloc", tabs);
+	tabs->heredoc[0] = '\0';
 	write(1, "heredoc> ", 10);
 	while (1)
 	{
-		line = check_limiter(limiter);
+		line = check_limiter(tabs);
 		if (!line)
 			break ;
-		tmp = ret;
-		ret = ft_strjoin(tmp, line);
+		tmp = tabs->heredoc;
+		tabs->heredoc = ft_strjoin(tmp, line);
+		if (!tabs->heredoc)
+			exit_error(errno, "Malloc", tabs);
 		free(tmp);
 		free(line);
 		write(1, "heredoc> ", 10);
 	}
-	return (ret);
 }

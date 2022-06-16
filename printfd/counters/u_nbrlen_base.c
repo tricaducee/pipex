@@ -1,33 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exit_error.c                                       :+:      :+:    :+:   */
+/*   u_nbrlen_base.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/08 19:53:07 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/16 21:25:16 by hrolle           ###   ########.fr       */
+/*   Created: 2022/05/23 17:19:58 by hrolle            #+#    #+#             */
+/*   Updated: 2022/06/16 11:16:25 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../pipex.h"
+#include "../HEADER/ft_printfd.h"
 
-void	exit_error(int errnum, char *str, t_ptr *tabs)
+int	u_nbrlen_base(unsigned long nbr, unsigned long base, t_flags *flags)
 {
-	if (tabs->fd)
+	unsigned int	i;
+
+	i = 0;
+	if (flags->zpoint && !nbr)
+		return (0);
+	if ((flags->sharp && nbr > 0 && base > 10) || flags->p)
 	{
-		close_fds(tabs->fd);
-		free_int_fd(tabs->fd);
+		if (flags->point)
+			flags->point += 2;
+		i += 2;
 	}
-	if (tabs->path)
-		free_strs(tabs->path);
-	if (tabs->command)
-		free_strs(tabs->command);
-	if (tabs->heredoc)
+	else if (flags->sharp && nbr > 0 && base < 10)
+		i++;
+	while (nbr >= base)
 	{
-		free(tabs->heredoc);
-		tabs->heredoc = NULL;
+		nbr /= base;
+		i++;
 	}
-	ft_printfd(2, "#rERROR#0 : [#/r%s #0:#r/ %s#0]\n", str, strerror(errnum));
-	exit (errnum);
+	return (i + 1);
 }

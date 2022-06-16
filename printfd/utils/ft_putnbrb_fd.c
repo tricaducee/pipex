@@ -1,33 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exit_error.c                                       :+:      :+:    :+:   */
+/*   ft_putnbr_base_u.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/08 19:53:07 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/16 21:25:16 by hrolle           ###   ########.fr       */
+/*   Created: 2022/05/23 17:15:16 by hrolle            #+#    #+#             */
+/*   Updated: 2022/06/16 10:39:15 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../pipex.h"
+#include "../HEADER/ft_printfd.h"
 
-void	exit_error(int errnum, char *str, t_ptr *tabs)
+void	ft_putnbrb_fd(int fd, unsigned long n, char *str, unsigned long base)
 {
-	if (tabs->fd)
-	{
-		close_fds(tabs->fd);
-		free_int_fd(tabs->fd);
-	}
-	if (tabs->path)
-		free_strs(tabs->path);
-	if (tabs->command)
-		free_strs(tabs->command);
-	if (tabs->heredoc)
-	{
-		free(tabs->heredoc);
-		tabs->heredoc = NULL;
-	}
-	ft_printfd(2, "#rERROR#0 : [#/r%s #0:#r/ %s#0]\n", str, strerror(errnum));
-	exit (errnum);
+	unsigned int	nb;
+
+	nb = n;
+	if (n >= base)
+		ft_putnbrb_fd(fd, n / base, str, base);
+	ft_putchar_fd(fd, str[nb % base]);
 }

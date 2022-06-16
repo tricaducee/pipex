@@ -6,7 +6,7 @@
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 19:36:38 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/08 19:44:51 by hrolle           ###   ########.fr       */
+/*   Updated: 2022/06/16 22:00:00 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,17 +24,6 @@ int	compt_path(char *s)
 		s++;
 	}
 	return (j);
-}
-
-char	**free_tab(char **strs)
-{
-	while (*strs)
-	{
-		free(*strs);
-		*strs = NULL;
-		strs++;
-	}
-	return (NULL);
 }
 
 char	*path_and_cmd(char *path, char *cmd)
@@ -56,27 +45,25 @@ char	*path_and_cmd(char *path, char *cmd)
 	return (ret);
 }
 
-char	**split_path(char *str, char *cmd)
+void	split_path(char *str, t_ptr *tabs)
 {
 	int		i;
-	char	**strs;
 	int		cmd_len;
 
 	i = 0;
-	cmd_len = ft_strlen(cmd);
-	strs = malloc((compt_path(str) + 1) * sizeof(char *));
-	if (!strs)
-		return (NULL);
+	cmd_len = ft_strlen(tabs->command[0]);
+	tabs->path = malloc((compt_path(str) + 1) * sizeof(char *));
+	if (!tabs->path)
+		exit_error(errno, "Malloc", tabs);
 	while (*str)
 	{
-		strs[i] = path_and_cmd(str, cmd);
-		if (!strs[i])
-			return (free_tab(strs));
+		tabs->path[i] = path_and_cmd(str, tabs->command[0]);
+		if (!tabs->path[i])
+			exit_error(errno, "Malloc", tabs);
 		str += ft_strlen_c(str, ':');
 		if (*str == ':')
 			str++;
 		i++;
 	}
-	strs[i] = NULL;
-	return (strs);
+	tabs->path[i] = NULL;
 }
