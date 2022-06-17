@@ -28,6 +28,6 @@ void	exit_error(int errnum, char *str, t_ptr *tabs)
 		free(tabs->heredoc);
 		tabs->heredoc = NULL;
 	}
-	ft_printfd(2, "#rERROR#0 : [#/r%s #0:#r/ %s#0]\n", str, strerror(errnum));
+	ft_printfd(2, "#rERROR#0 : [#/r%s #0:#/r %s#0]\n", str, strerror(errnum));
 	exit (errnum);
 }

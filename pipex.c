@@ -108,14 +108,16 @@ void	multi_exec(int ac, t_ptr *tabs)
 int	main(int ac, char **av, char *envp[])
 {
 	t_ptr	tabs;
+	int		herefunc;
 
 	set_t_ptr(&tabs);
+	herefunc = ft_strcmp("here_doc", av[1]);
 	tabs.av = av;
 	tabs.envp = envp;
-	if (ac < 4)
+	if (ac < 4 || (ac < 5 && herefunc))
 		exit_error(errno, "More arguments are required", &tabs);
 	fd_gen(ac, &tabs);
-	if (ac == 4 || (ac == 5 && ft_strcmp("here_doc", av[1])))
+	if (ac == 4 || (ac == 5 && herefunc))
 		exec_cmd1(tabs.fd[0], av[ac - 2], &tabs);
 	else
 		multi_exec(ac, &tabs);
