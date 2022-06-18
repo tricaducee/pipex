@@ -1,25 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   close_fds.c                                        :+:      :+:    :+:   */
+/*   free_tabs.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/16 18:18:35 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/16 21:17:51 by hrolle           ###   ########.fr       */
+/*   Created: 2022/06/16 19:19:39 by hrolle            #+#    #+#             */
+/*   Updated: 2022/06/18 07:57:07 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../pipex.h"
+#include "../HEADER/pipex.h"
 
-void	close_fds(int **fd)
+void	**free_tabs(void **tabs)
 {
-	while (*fd)
+	int	i;
+
+	i = 0;
+	while (tabs[i])
 	{
-		if ((*fd)[0] < 2)
-			close((*fd)[0]);
-		if ((*fd)[1] < 2)
-			close((*fd)[1]);
-		fd++;
+		free(tabs[i]);
+		tabs[i++] = NULL;
 	}
+	free(tabs);
+	return (NULL);
 }

@@ -1,27 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   fdin_out.c                                         :+:      :+:    :+:   */
+/*   ft_strjoin.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/16 21:38:51 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/16 21:39:41 by hrolle           ###   ########.fr       */
+/*   Created: 2022/06/18 04:36:33 by hrolle            #+#    #+#             */
+/*   Updated: 2022/06/18 04:36:41 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
+#include "../HEADER/pipex.h"
 
-void	fdin_out(int fdin, int fdout, t_ptr *tabs)
+char	*ft_strjoin(const char *s1, const char *s2)
 {
-	if (dup2(fdin, STDIN_FILENO) == -1)
-		exit_error(errno, "Dup2", tabs);
-	if (dup2(fdout, STDOUT_FILENO) == -1)
-		exit_error(errno, "Dup2", tabs);
-}
+	char	*str;
+	char	*ret;
 
-void	close2(int fd1, int fd2)
-{
-	close(fd1);
-	close(fd2);
+	if (!s1 || !s2)
+		return (NULL);
+	str = malloc((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof(char));
+	if (!str)
+		return (NULL);
+	ret = str;
+	while (*s1)
+		*(str++) = *(s1++);
+	while (*s2)
+		*(str++) = *(s2++);
+	*str = 0;
+	return (ret);
 }

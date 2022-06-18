@@ -9,7 +9,11 @@ BOLD = \033[1m
 
 RM = rm -rf
 
-SRC = $(wildcard *.c libft/*.c free_and_secure/*.c)
+SRC =	libft/ft_split.c		libft/ft_strdup.c	libft/ft_strlen_c.c		main/close2.c	\
+		main/here_doc.c			main/pipex.c		secure/close_fds.c		secure/free_and_null.c	\
+		secure/if_close_fd.c	libft/ft_strcmp.c	libft/ft_strjoin.c		libft/ft_substr.c	\
+		main/fdin_out.c			main/pipes_gen.c	main/split_path.c		secure/exit_error.c	\
+		secure/free_tabs.c
 
 OBJ = $(SRC:.c=.o)
 
@@ -17,7 +21,7 @@ NAME = pipex
 
 CC = gcc
 
-CFLAGS = -Wall -Werror -Wextra -fsanitize=address -g3
+CFLAGS = -Wall -Werror -Wextra
 
 $(NAME) : $(OBJ)
 	@make -C printfd

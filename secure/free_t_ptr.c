@@ -1,33 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exit_error.c                                       :+:      :+:    :+:   */
+/*   free_t_ptr.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/08 19:53:07 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/16 21:25:16 by hrolle           ###   ########.fr       */
+/*   Created: 2022/06/18 12:57:35 by hrolle            #+#    #+#             */
+/*   Updated: 2022/06/18 12:58:40 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../pipex.h"
+#include "../HEADER/pipex.h"
 
-void	exit_error(int errnum, char *str, t_ptr *tabs)
+void	free_t_ptr(t_ptr *tabs)
 {
 	if (tabs->fd)
 	{
 		close_fds(tabs->fd);
-		free_int_fd(tabs->fd);
+		tabs->fd = (int **)free_tabs((void **)tabs->fd);
 	}
 	if (tabs->path)
-		free_strs(tabs->path);
+		tabs->path = (char **)free_tabs((void **)tabs->path);
 	if (tabs->command)
-		free_strs(tabs->command);
+		tabs->command = (char **)free_tabs((void **)tabs->command);
 	if (tabs->heredoc)
-	{
-		free(tabs->heredoc);
-		tabs->heredoc = NULL;
-	}
-	ft_printfd(2, "#rERROR#0 : [#/r%s #0:#/r %s#0]\n", str, strerror(errnum));
-	exit (errnum);
+		free_and_null(&tabs->heredoc);
 }

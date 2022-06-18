@@ -6,11 +6,11 @@
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 19:36:38 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/16 22:00:00 by hrolle           ###   ########.fr       */
+/*   Updated: 2022/06/18 09:09:26 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../pipex.h"
+#include "../HEADER/pipex.h"
 
 int	compt_path(char *s)
 {
@@ -54,12 +54,12 @@ void	split_path(char *str, t_ptr *tabs)
 	cmd_len = ft_strlen(tabs->command[0]);
 	tabs->path = malloc((compt_path(str) + 1) * sizeof(char *));
 	if (!tabs->path)
-		exit_error(errno, "Malloc", tabs);
+		exit_error(errno, "Malloc failure", tabs);
 	while (*str)
 	{
 		tabs->path[i] = path_and_cmd(str, tabs->command[0]);
 		if (!tabs->path[i])
-			exit_error(errno, "Malloc", tabs);
+			exit_error(errno, "Malloc failure", tabs);
 		str += ft_strlen_c(str, ':');
 		if (*str == ':')
 			str++;

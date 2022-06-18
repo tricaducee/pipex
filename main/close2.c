@@ -1,19 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   free_and_null.c                                    :+:      :+:    :+:   */
+/*   close2.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/16 21:23:49 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/16 21:36:00 by hrolle           ###   ########.fr       */
+/*   Created: 2022/06/18 08:29:40 by hrolle            #+#    #+#             */
+/*   Updated: 2022/06/18 08:31:41 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../pipex.h"
+#include "../HEADER/pipex.h"
 
-void	free_and_null(char **str)
+void	close2(int fd1, int fd2)
 {
-	free(*str);
-	*str = NULL;
+	close(fd1);
+	close(fd2);
 }

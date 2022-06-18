@@ -6,30 +6,11 @@
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/11 10:29:10 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/16 21:25:39 by hrolle           ###   ########.fr       */
+/*   Updated: 2022/06/18 09:15:27 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
-
-char	*ft_strjoin(const char *s1, const char *s2)
-{
-	char	*str;
-	char	*ret;
-
-	if (!s1 || !s2)
-		return (NULL);
-	str = malloc((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof(char));
-	if (!str)
-		return (NULL);
-	ret = str;
-	while (*s1)
-		*(str++) = *(s1++);
-	while (*s2)
-		*(str++) = *(s2++);
-	*str = 0;
-	return (ret);
-}
+#include "../HEADER/pipex.h"
 
 int	nl_strcmp(char *s1, char *s2)
 {
@@ -52,7 +33,7 @@ char	*check_limiter(t_ptr *tabs)
 	buf[1] = 0;
 	line = malloc(1 * sizeof(char));
 	if (!line)
-		exit_error(errno, "Malloc", tabs);
+		exit_error(errno, "Malloc failure", tabs);
 	*line = '\0';
 	while (1)
 	{
@@ -61,7 +42,7 @@ char	*check_limiter(t_ptr *tabs)
 		line = ft_strjoin(tmp, buf);
 		free(tmp);
 		if (!line)
-			exit_error(errno, "Malloc", tabs);
+			exit_error(errno, "Malloc failure", tabs);
 		if (*buf == '\n')
 			break ;
 	}
@@ -77,7 +58,7 @@ void	heredoc_str(t_ptr *tabs)
 
 	tabs->heredoc = malloc(1 * sizeof(char));
 	if (!tabs->heredoc)
-		exit_error(errno, "Malloc", tabs);
+		exit_error(errno, "Malloc failure", tabs);
 	tabs->heredoc[0] = '\0';
 	write(1, "heredoc> ", 10);
 	while (1)
@@ -88,7 +69,7 @@ void	heredoc_str(t_ptr *tabs)
 		tmp = tabs->heredoc;
 		tabs->heredoc = ft_strjoin(tmp, line);
 		if (!tabs->heredoc)
-			exit_error(errno, "Malloc", tabs);
+			exit_error(errno, "Malloc failure", tabs);
 		free(tmp);
 		free(line);
 		write(1, "heredoc> ", 10);

@@ -6,11 +6,11 @@
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 19:24:20 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/08 19:41:07 by hrolle           ###   ########.fr       */
+/*   Updated: 2022/06/18 04:25:06 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../pipex.h"
+#include "../HEADER/pipex.h"
 
 char	*ft_substr(char *s, unsigned int start, size_t len)
 {

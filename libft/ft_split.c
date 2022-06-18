@@ -6,11 +6,11 @@
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 19:24:31 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/08 19:24:33 by hrolle           ###   ########.fr       */
+/*   Updated: 2022/06/18 04:25:28 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../pipex.h"
+#include "../HEADER/pipex.h"
 
 int	compt_w(char *s, char c)
 {

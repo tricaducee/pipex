@@ -1,27 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   free_int_fd.c                                    :+:      :+:    :+:   */
+/*   close_fds.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/08 19:49:14 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/16 18:11:51 by hrolle           ###   ########.fr       */
+/*   Created: 2022/06/16 18:18:35 by hrolle            #+#    #+#             */
+/*   Updated: 2022/06/18 04:33:29 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../pipex.h"
+#include "../HEADER/pipex.h"
 
-int	**free_int_fd(int **fd)
+void	close_fds(int **fd)
 {
-	int	i;
-
-	i = 0;
-	while (fd[i])
+	while (*fd)
 	{
-		free(fd[i]);
-		fd[i++] = NULL;
+		if ((*fd)[0] < 2)
+			close((*fd)[0]);
+		if ((*fd)[1] < 2)
+			close((*fd)[1]);
+		fd++;
 	}
-	free(fd);
-	return (NULL);
 }

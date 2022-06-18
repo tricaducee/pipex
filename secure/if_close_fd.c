@@ -1,27 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   free_strs.c                                        :+:      :+:    :+:   */
+/*   if_close_fd.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/16 19:19:39 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/16 21:16:02 by hrolle           ###   ########.fr       */
+/*   Created: 2022/06/18 08:36:19 by hrolle            #+#    #+#             */
+/*   Updated: 2022/06/18 10:11:05 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../pipex.h"
+#include "../HEADER/pipex.h"
 
-char	**free_strs(char **strs)
+void	if_close_fd(int i, t_ptr *tabs)
 {
-	int	i;
-
-	i = 0;
-	while (strs[i])
+	if (i)
 	{
-		free(strs[i]);
-		strs[i++] = NULL;
+		close(tabs->fd[i][0]);
+		close(tabs->fd[i][1]);
 	}
-	free(strs);
-	return (NULL);
+	else
+		close(tabs->fd[i][0]);
 }

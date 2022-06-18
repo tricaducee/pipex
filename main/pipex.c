@@ -6,11 +6,11 @@
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 19:23:41 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/16 22:00:43 by hrolle           ###   ########.fr       */
+/*   Updated: 2022/06/18 13:08:08 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
+#include "../HEADER/pipex.h"
 
 void	set_t_ptr(t_ptr *tabs)
 {
@@ -18,6 +18,7 @@ void	set_t_ptr(t_ptr *tabs)
 	tabs->path = NULL;
 	tabs->command = NULL;
 	tabs->heredoc = NULL;
+	tabs->on_exit = 0;
 }
 
 void	exec_cmd(int *fdin, int *fdout, char *cmd, t_ptr *tabs)
@@ -30,7 +31,7 @@ void	exec_cmd(int *fdin, int *fdout, char *cmd, t_ptr *tabs)
 	i = 0;
 	tabs->command = ft_split(cmd, ' ');
 	if (!tabs->command)
-		exit_error(errno, "Malloc", tabs);
+		exit_error(errno, "Malloc failure", tabs);
 	while (tabs->envp[i] && !ft_strcmp("PATH=", tabs->envp[i]))
 		i++;
 	if (!ft_strchr(tabs->command[0], '/'))
@@ -43,10 +44,10 @@ void	exec_cmd(int *fdin, int *fdout, char *cmd, t_ptr *tabs)
 	if (tabs->path[i])
 	{
 		if (execve(tabs->path[i], tabs->command, tabs->envp) == -1)
-			exit_error(errno, tabs->command[0], tabs);
+			exit_error(errno, cmd, tabs);
 	}
 	else
-		exit_error(errno, "command not found", tabs);
+		exit_error(errno, cmd, tabs);
 }
 
 void	exec_cmd1(int *fd, char *cmd, t_ptr *tabs)
@@ -58,7 +59,7 @@ void	exec_cmd1(int *fd, char *cmd, t_ptr *tabs)
 	i = 0;
 	tabs->command = ft_split(cmd, ' ');
 	if (!tabs->command)
-		exit_error(errno, "Malloc", tabs);
+		exit_error(errno, "Malloc failure", tabs);
 	while (tabs->envp[i] && !ft_strcmp("PATH=", tabs->envp[i]))
 		i++;
 	if (!ft_strchr(tabs->command[0], '/'))
@@ -71,36 +72,36 @@ void	exec_cmd1(int *fd, char *cmd, t_ptr *tabs)
 	if (tabs->path[i])
 	{
 		if (execve(tabs->path[i], tabs->command, tabs->envp) == -1)
-			exit_error(errno, tabs->command[0], tabs);
+			exit_error(errno, cmd, tabs);
 	}
 	else
-		exit_error(errno, "command not found", tabs);
+		exit_error(errno, cmd, tabs);
 }
 
 void	multi_exec(int ac, t_ptr *tabs)
 {
 	int	pid;
-	int	cmd_i;
 	int	i;
 
 	i = 0;
-	if (ft_strcmp(tabs->av[1], "here_doc"))
-		cmd_i = 3;
-	else
-		cmd_i = 2;
-	while (i < ac - (cmd_i + 2))
+	while (i < ac - (tabs->cmd_i + 2))
 	{
+		if (tabs->on_exit == 1)
+			exit_error(EXIT_FAILURE, "Another proccess failure", tabs);
+		if (i)
+			close(tabs->fd[i][1]);
 		pid = fork();
 		if (pid == -1)
-			exit_error(errno, "Fork didn't work", tabs);
+			exit_error(errno, "Fork failure", tabs);
 		if (!pid)
-			exec_cmd(tabs->fd[i], tabs->fd[i + 1], tabs->av[cmd_i + i], tabs);
+			exec_cmd(tabs->fd[i], tabs->fd[i + 1],
+				tabs->av[tabs->cmd_i + i], tabs);
 		else
 		{
-			if_close_fd(i, tabs->fd);
-			wait(&pid);
-			if (++i == ac - (cmd_i + 2))
-				exec_cmd(tabs->fd[i], tabs->fd[0], tabs->av[cmd_i + i], tabs);
+			if_close_fd(i, tabs);
+			if (++i == ac - (tabs->cmd_i + 2))
+				exec_cmd(tabs->fd[i], tabs->fd[0],
+					tabs->av[tabs->cmd_i + i], tabs);
 		}
 	}
 }
@@ -108,29 +109,22 @@ void	multi_exec(int ac, t_ptr *tabs)
 int	main(int ac, char **av, char *envp[])
 {
 	t_ptr	tabs;
-	int		herefunc;
 
 	set_t_ptr(&tabs);
-	herefunc = ft_strcmp("here_doc", av[1]);
+	if (ac < 4)
+		exit_error(EXIT_FAILURE, "More arguments are required", &tabs);
+	if (ft_strcmp("here_doc", av[1]))
+		tabs.cmd_i = 3;
+	else
+		tabs.cmd_i = 2;
 	tabs.av = av;
 	tabs.envp = envp;
-	if (ac < 4 || (ac < 5 && herefunc))
-		exit_error(errno, "More arguments are required", &tabs);
+	if (ac < 5 && tabs.cmd_i == 3)
+		exit_error(EXIT_FAILURE, "More arguments are required", &tabs);
 	fd_gen(ac, &tabs);
-	if (ac == 4 || (ac == 5 && herefunc))
+	if (ac == 4 || (ac == 5 && tabs.cmd_i == 3))
 		exec_cmd1(tabs.fd[0], av[ac - 2], &tabs);
 	else
 		multi_exec(ac, &tabs);
 	return (0);
 }
-
-/*
-void	print_tab(char **strs)
-{
-	while (*strs)
-	{
-		ft_printf("%s\n", *strs);
-		strs++;
-	}
-}
-*/

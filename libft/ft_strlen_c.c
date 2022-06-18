@@ -6,11 +6,11 @@
 /*   By: hrolle <hrolle@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 19:36:46 by hrolle            #+#    #+#             */
-/*   Updated: 2022/06/08 19:41:16 by hrolle           ###   ########.fr       */
+/*   Updated: 2022/06/18 04:25:12 by hrolle           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../pipex.h"
+#include "../HEADER/pipex.h"
 
 int	ft_strlen_c(char *str, char c)
 {

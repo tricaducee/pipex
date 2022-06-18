@@ -9,7 +9,12 @@ BOLD = \033[1m
 
 RM = rm -rf
 
-SRC = $(wildcard */*.c)
+SRC =	counters/ft_strlen.c			main/flags_check_fd.c			print_functions/print_len_fd.c	print_functions/print_upx_fd.c	\
+		text_mod/text_mod_fd.c			utils/ft_putstr_fd.c			counters/len_atoi.c				main/ft_printfd.c	\
+		print_functions/print_o_fd.c	print_functions/print_x_fd.c	utils/ft_putchar_fd.c			utils/ft_strchr.c	\
+		counters/nbrlen.c				print_functions/print_c_fd.c	print_functions/print_s_fd.c	text_mod/bright_fd.c	\
+		utils/ft_putnbr_fd.c			counters/u_nbrlen_base.c		print_functions/print_d_fd.c	print_functions/print_u_fd.c	\
+		text_mod/flags_text_fd.c		utils/ft_putnbrb_fd.c
 
 OBJ = $(SRC:.c=.o)
 
